@@ -15,9 +15,9 @@ The following items should be installed in your system:
     git clone https://github.com/ProgIsLove/Tank-1990.git
     ```
  2) Inside Eclipse 
-  ```
-  File -> New -> Java Project, untick "Use default location" and browse the git project path by clicking browse button
-  ```
+    ```
+    File -> New -> Java Project, untick "Use default location" and browse the git project path by clicking browse button
+    ```
  
  
  3) Play & Enjoy!

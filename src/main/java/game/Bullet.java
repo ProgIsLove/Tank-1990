@@ -7,14 +7,14 @@ import javafx.scene.image.WritableImage;
 
 public class Bullet extends GameObject {
 
-	private final Handler handler;
+	private final HandlerImpl handlerImpl;
 	private final Hud hud;
 	private final WritableImage bulletImages;
 
-	public Bullet(int x, int y, ID id, int direction, Handler handler,
+	public Bullet(int x, int y, ID id, int direction, HandlerImpl handlerImpl,
 			SpriteSheet sheet, Hud hud) {
 		super(x, y, id, direction);
-		this.handler = handler;
+		this.handlerImpl = handlerImpl;
 		this.hud = hud;
 		
 		bulletImages = sheet.grabImage(1, 4, GameConstant.BULLET_SIZE, GameConstant.BULLET_SIZE);
@@ -67,21 +67,21 @@ public class Bullet extends GameObject {
 	}
 	
 	public void collision() {
-		for (int i = 0; i < handler.object.size(); i++) {
-			GameObject tempObject = handler.object.get(i);
+		for (int i = 0; i < handlerImpl.object.size(); i++) {
+			GameObject tempObject = handlerImpl.object.get(i);
 
 			if (tempObject.getId() == ID.BLOCK_BRICK_WALL) {
 				if (getBounds().intersects(tempObject.getBounds())) {
-					handler.removeObject(this);
-					handler.removeObject(tempObject);
+					handlerImpl.removeObject(this);
+					handlerImpl.removeObject(tempObject);
 				}
 			}
 			if(tempObject.getId() == ID.ENEMY) {
 				if (getBounds().intersects(tempObject.getBounds())) {
 					int tempCounter = hud.getEnemyCount();
 					int tempScore = hud.getScore();
-					handler.removeObject(this);
-					handler.removeObject(tempObject);
+					handlerImpl.removeObject(this);
+					handlerImpl.removeObject(tempObject);
 					tempCounter -= 1;
 					tempScore += GameConstant.SCORE;
 					hud.setEnemyCount(tempCounter);
@@ -91,7 +91,7 @@ public class Bullet extends GameObject {
 			
 			if(tempObject.getId() == ID.BLOCK_STEEL_WALL || tempObject.getId() == ID.BLOCK_SEA_WALL) {
 				if(getBounds().intersects(tempObject.getBounds())) {
-					handler.removeObject(this);
+					handlerImpl.removeObject(this);
 				}
 			}	
 		}

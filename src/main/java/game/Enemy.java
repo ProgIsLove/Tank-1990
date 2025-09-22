@@ -10,17 +10,17 @@ public class Enemy extends GameObject {
 
     private final Spawner spawner;
     private final Hud hud;
-    private final Handler handler;
+    private final HandlerImpl handlerImpl;
     private final SpriteSheet sheet;
     private final WritableImage[] enemyImages = new WritableImage[4];
 	private final Random rnd = new Random();
 
     private int timerShoot;
 
-	public Enemy(int x, int y, ID id, int direction, Handler handler,
+	public Enemy(int x, int y, ID id, int direction, HandlerImpl handlerImpl,
 			SpriteSheet sheet, Spawner spawner, Hud hud) {
 		super(x, y, id, direction);
-		this.handler = handler;
+		this.handlerImpl = handlerImpl;
 		this.sheet = sheet;
 		this.spawner = spawner;
 		this.hud = hud;
@@ -66,9 +66,9 @@ public class Enemy extends GameObject {
 			throw new IllegalArgumentException("Unexpected value: " + getDirection());
 		}
 		if (timerShoot <= 0) {
-			handler.addObject(new EnemyBullet(getX() + GameConstant.BULLET_SIZE / 2,
+			handlerImpl.addObject(new EnemyBullet(getX() + GameConstant.BULLET_SIZE / 2,
 					getY() + GameConstant.BULLET_SIZE / 2, ID.ENEMY_BULLET, getDirection(),
-					handler, sheet, hud, spawner));
+                    handlerImpl, sheet, hud, spawner));
 			timerShoot = rnd.nextInt(GameConstant.TIMER_SHOOT);
 		} else
 			timerShoot--;
@@ -94,8 +94,8 @@ public class Enemy extends GameObject {
 	}
 	
 	public void collision() {
-		for (int i = 0; i < handler.object.size(); i++) {
-			GameObject tempObject = handler.object.get(i);
+		for (int i = 0; i < handlerImpl.object.size(); i++) {
+			GameObject tempObject = handlerImpl.object.get(i);
 
 			if (tempObject.getId() == ID.BLOCK_SEA_WALL || tempObject.getId() == ID.BLOCK_STEEL_WALL
 					|| tempObject.getId() == ID.BLOCK_BRICK_WALL) {

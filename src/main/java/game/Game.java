@@ -1,13 +1,15 @@
 package game;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class Game extends Canvas implements Renderable, Tickable {
 
-	private final Handler handler;
+	private final HandlerImpl handlerImpl;
 	private final Map map;
 	private final Spawner spawner;
 	private final BufferedImageLoader loader;
@@ -24,12 +26,12 @@ public class Game extends Canvas implements Renderable, Tickable {
 
         sheet = new SpriteSheet(loader.loadImage("/img/SpriteSheetPic.png"));
 		level = new Level();
-		handler = new Handler();
+		handlerImpl = new HandlerImpl();
 		hud = new Hud();
-		spawner = new Spawner(handler, sheet, hud);
-		map = new Map(handler, spawner, sheet, level);
+		spawner = new Spawner(handlerImpl, sheet, hud);
+		map = new Map(handlerImpl, spawner, sheet, level);
 
-        keyInput = new KeyInput(handler, sheet, hud);
+        keyInput = new KeyInput(handlerImpl, sheet, hud);
 
         setupGameLoop();
 	}
@@ -52,24 +54,25 @@ public class Game extends Canvas implements Renderable, Tickable {
         gameLoop.start();
     }
 
-    @Override
-    public void tick() {
-        handler.tick();
-        map.tick();
-        if (hud.getLive() <= 0 || hud.getCrownLive() <= 0) {
-            handler.object.clear();
-            System.out.println("Game Over! High score: " + hud.getScore());
-            restartGame();
+    public void stopGameLoop() {
+        if (gameLoop != null) {
+            gameLoop.stop();
         }
     }
 
-	public void restartGame() {
-		hud.setLive(5);
-		hud.setScore(0);
-		hud.setEnemyCount(0);
-		hud.setCrownLive(1);
-		map.setIsDraw(false);
-	}
+    @Override
+    public void tick() {
+        handlerImpl.tick();
+        map.tick();
+        if (hud.getLive() <= 0 || hud.getCrownLive() <= 0) {
+            handlerImpl.object.clear();
+            this.stopGameLoop();
+            Platform.runLater(() -> {
+                Stage stage = (Stage) this.getScene().getWindow();
+                new HighScoreScene(stage, hud.getScore());
+            });
+        }
+    }
 
     @Override
     public void render() {
@@ -80,7 +83,7 @@ public class Game extends Canvas implements Renderable, Tickable {
         gc.fillRect(0, 0, GameConstant.WIDTH, GameConstant.HEIGHT);
 
         // let other components render
-        handler.render(gc);
+        handlerImpl.render(gc);
         hud.render(gc);
     }
 }

@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS high_scores (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(3) NOT NULL,
+    score INT NOT NULL
+);

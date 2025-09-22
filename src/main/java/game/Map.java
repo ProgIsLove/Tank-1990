@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Map implements Tickable {
 
-    private final Handler handler;
+    private final HandlerImpl handlerImpl;
     private final SpriteSheet sheet;
     private final Spawner spawner;
     private final Level level;
@@ -14,8 +14,8 @@ public class Map implements Tickable {
 
     private int[][] gameField;
 
-    public Map(Handler handler, Spawner spawner, SpriteSheet sheet, Level level) {
-        this.handler = handler;
+    public Map(HandlerImpl handlerImpl, Spawner spawner, SpriteSheet sheet, Level level) {
+        this.handlerImpl = handlerImpl;
         this.spawner = spawner;
         this.sheet = sheet;
         this.level = level;
@@ -41,11 +41,11 @@ public class Map implements Tickable {
                 int y = row * GameConstant.BLOCK_SIZE;
 
                 switch (blockValue) {
-                    case 1 -> handler.addObject(new Block(x, y, ID.BLOCK_BRICK_WALL, sheet));
-                    case 2 -> handler.addObject(new Block(x, y, ID.BLOCK_STEEL_WALL, sheet));
-                    case 3 -> handler.addObject(new Block(x, y, ID.GOLDEN_CROWN, sheet));
-                    case 4 -> handler.addObject(new Player(x, y, ID.PLAYER, 1, handler, sheet));
-                    case 5 -> handler.addObject(new Block(x, y, ID.BLOCK_SEA_WALL, sheet));
+                    case 1 -> handlerImpl.addObject(new Block(x, y, ID.BLOCK_BRICK_WALL, sheet));
+                    case 2 -> handlerImpl.addObject(new Block(x, y, ID.BLOCK_STEEL_WALL, sheet));
+                    case 3 -> handlerImpl.addObject(new Block(x, y, ID.GOLDEN_CROWN, sheet));
+                    case 4 -> handlerImpl.addObject(new Player(x, y, ID.PLAYER, 1, handlerImpl, sheet));
+                    case 5 -> handlerImpl.addObject(new Block(x, y, ID.BLOCK_SEA_WALL, sheet));
                 }
             }
         }

@@ -66,7 +66,7 @@ public class Player extends GameObject {
             if (obj == this) continue;
 
             if (getBounds().intersects(obj.getBounds())) {
-                switch (obj.getId()) {
+                switch (obj.getGameObjectType()) {
                     case BLOCK_SEA_WALL, BLOCK_STEEL_WALL, BLOCK_BRICK_WALL -> {
                         int tempX = getX();
                         tempX -= getSpeedX();

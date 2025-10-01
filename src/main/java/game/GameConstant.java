@@ -13,4 +13,5 @@ public class GameConstant {
     public static final int TIMER_SHOOT = 70;
     public static final int RESPAWN_TIME = 100;
     public static final int SCORE = 200;
+    public static final int MAX_ENEMIES = 5;
 }

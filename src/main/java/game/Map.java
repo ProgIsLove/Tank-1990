@@ -10,7 +10,6 @@ public class Map implements Tickable {
     private final Spawner spawner;
 
     private boolean isDraw = false;
-
     private int[][] gameField;
 
     public Map(Level level, GameContext gameContext, Spawner spawner) {

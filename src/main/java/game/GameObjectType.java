@@ -1,7 +1,6 @@
 package game;
 
 public enum GameObjectType {
-
     PLAYER,
     BULLET,
     ENEMY_BULLET,

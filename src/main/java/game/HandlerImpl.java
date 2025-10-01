@@ -15,7 +15,7 @@ public class HandlerImpl implements Handler, Tickable {
     public List<GameObject> getGameObjectsByType(GameObjectType type) {
         List<GameObject> result = new ArrayList<>();
         for (GameObject obj : gameObjects) {
-            if (obj.getId() == type) result.add(obj);
+            if (obj.getGameObjectType() == type) result.add(obj);
         }
         return result;
     }
@@ -24,7 +24,7 @@ public class HandlerImpl implements Handler, Tickable {
         List<GameObject> result = new ArrayList<>();
         for (GameObject obj : gameObjects) {
             for (GameObjectType type : types) {
-                if (obj.getId() == type) {
+                if (obj.getGameObjectType() == type) {
                     result.add(obj);
                     break;
                 }

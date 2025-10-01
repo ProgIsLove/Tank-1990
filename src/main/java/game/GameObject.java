@@ -2,27 +2,26 @@ package game;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.shape.Rectangle;
 
 
 public abstract class GameObject {
 	
 	private int x;
 	private int y;
-	private ID id;
+	private GameObjectType gameObjectType;
 	private int speedX;
 	private int speedY;
 	private int direction;
 
-    protected GameObject(int x, int y, ID id, int direction) {
-		this(x,y,id);
+    protected GameObject(int x, int y, GameObjectType gameObjectType, int direction) {
+		this(x,y, gameObjectType);
 		this.direction = direction;
 	}
 	
-	protected GameObject(int x, int y, ID id) {
+	protected GameObject(int x, int y, GameObjectType gameObjectType) {
 		this.x = x;
 		this.y = y;
-		this.id = id;
+		this.gameObjectType = gameObjectType;
 	}
 
 	public abstract void tick();
@@ -45,8 +44,8 @@ public abstract class GameObject {
 		this.y = y;
 	}
 
-	public ID getId() {
-		return id;
+	public GameObjectType getId() {
+		return gameObjectType;
 	}
 
 	public int getSpeedX() {

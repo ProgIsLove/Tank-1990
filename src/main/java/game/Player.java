@@ -5,35 +5,40 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 
+import java.util.List;
+
 public class Player extends GameObject {
 	
-	private final HandlerImpl handlerImpl;
+	private final GameContext gameContext;
 	private final WritableImage[] playerImages = new WritableImage[4];
-	
-	public Player(int x, int y, ID id, int direction, HandlerImpl handlerImpl, SpriteSheet sheet) {
-		super(x, y, id, direction);
-		this.handlerImpl = handlerImpl;
-		
-		playerImages[0] = sheet.grabImage(1, 6, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-		playerImages[1] = sheet.grabImage(2, 1, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-		playerImages[2] = sheet.grabImage(2, 2, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-		playerImages[3] = sheet.grabImage(2, 3, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+
+	public Player(int x, int y, GameObjectType gameObjectType, int direction, GameContext gameContext) {
+		super(x, y, gameObjectType, direction);
+        this.gameContext = gameContext;
+
+        playerImages[0] = gameContext.sheet.grabImage(1, 6, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		playerImages[1] = gameContext.sheet.grabImage(2, 1, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		playerImages[2] = gameContext.sheet.grabImage(2, 2, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		playerImages[3] = gameContext.sheet.grabImage(2, 3, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
 	}
 	
 	@Override
 	public void tick() {
-		int tempY = getY();
-		tempY += getSpeedY();
-		setY(tempY);
-		
-		int tempX = getX();
-		tempX += getSpeedX();
-		setX(tempX);
-		
-		collision();
+        move();
+        collision();
 	}
-	
-	@Override
+
+    private void move() {
+        int tempY = getY();
+        tempY += getSpeedY();
+        setY(tempY);
+
+        int tempX = getX();
+        tempX += getSpeedX();
+        setX(tempX);
+    }
+
+    @Override
 	public void render(GraphicsContext g) {
 		if(getDirection() == 1)
 			g.drawImage(playerImages[0], getX(), getY());
@@ -51,21 +56,28 @@ public class Player extends GameObject {
 	}
 	
 	public void collision() {
-		for(int i = 0; i < handlerImpl.object.size(); i++) {
-			GameObject tempObject = handlerImpl.object.get(i);
-			
-			if(tempObject.getId() == ID.BLOCK_SEA_WALL || tempObject.getId() == ID.BLOCK_STEEL_WALL || tempObject.getId() == ID.BLOCK_BRICK_WALL) {
-				if(getBounds().intersects(tempObject.getBounds())) {
-					
-					int tempX = getX();
-					tempX -= getSpeedX();
-					setX(tempX);
-					
-					int tempY = getY();
-					tempY -= getSpeedY();
-					setY(tempY);
-				}
-			}
-		}
+        List<GameObject> gameObject = gameContext.handler.getGameObjectsByTypes(
+                GameObjectType.BLOCK_BRICK_WALL,
+                GameObjectType.BLOCK_STEEL_WALL,
+                GameObjectType.BLOCK_SEA_WALL
+        );
+
+        for (GameObject obj : gameObject) {
+            if (obj == this) continue;
+
+            if (getBounds().intersects(obj.getBounds())) {
+                switch (obj.getId()) {
+                    case BLOCK_SEA_WALL, BLOCK_STEEL_WALL, BLOCK_BRICK_WALL -> {
+                        int tempX = getX();
+                        tempX -= getSpeedX();
+                        setX(tempX);
+
+                        int tempY = getY();
+                        tempY -= getSpeedY();
+                        setY(tempY);
+                    }
+                }
+            }
+        }
 	}	
 }

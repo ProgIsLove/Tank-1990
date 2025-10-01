@@ -8,8 +8,9 @@ public class SpriteSheet {
 
     private final Image sheet;
 
-    public SpriteSheet(Image sheet) {
-        this.sheet = sheet;
+    public SpriteSheet() {
+        BufferedImageLoader loader = new BufferedImageLoader();
+        this.sheet = loader.loadImage("/img/SpriteSheetPic.png");
     }
 
     public WritableImage grabImage(int col, int row, int width, int height) {

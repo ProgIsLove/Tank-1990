@@ -7,4 +7,5 @@ public interface Handler {
 	void addObject(GameObject object);
 	void removeObject(GameObject object);
 	void render(GraphicsContext g);
+    void clear();
 }

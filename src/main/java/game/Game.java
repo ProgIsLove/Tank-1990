@@ -29,7 +29,9 @@ public class Game extends Canvas implements Renderable, Tickable {
         spawner = new Spawner(gameContext);
 		map = new Map(level, gameContext, spawner);
 
-        keyInput = new KeyInput(gameContext);
+        keyInput = new KeyInput();
+        PlayerController playerController = new PlayerController(gameContext);
+        keyInput.addObserver(playerController);
 
         setupGameLoop();
 	}

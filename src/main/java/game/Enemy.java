@@ -4,7 +4,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -30,8 +29,6 @@ public class Enemy extends GameObject {
 		enemyImages[1] = gameContext.sheet.grabImage(2, 5, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
 		enemyImages[2] = gameContext.sheet.grabImage(2, 6, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
 		enemyImages[3] = gameContext.sheet.grabImage(3, 1, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-
-
 	}
 	
 	@Override
@@ -110,7 +107,7 @@ public class Enemy extends GameObject {
             if (obj == this) continue;
 
             if (getBounds().intersects(obj.getBounds())) {
-                switch (obj.getId()) {
+                switch (obj.getGameObjectType()) {
                     case BLOCK_SEA_WALL, BLOCK_STEEL_WALL, BLOCK_BRICK_WALL -> {
                         int tempY = getY();
                         int tempX = getX();

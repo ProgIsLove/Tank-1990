@@ -5,10 +5,11 @@ import javafx.scene.canvas.GraphicsContext;
 
 
 public abstract class GameObject {
-	
+
+    private final GameObjectType gameObjectType;
+
 	private int x;
 	private int y;
-	private GameObjectType gameObjectType;
 	private int speedX;
 	private int speedY;
 	private int direction;
@@ -44,7 +45,7 @@ public abstract class GameObject {
 		this.y = y;
 	}
 
-	public GameObjectType getId() {
+	public GameObjectType getGameObjectType() {
 		return gameObjectType;
 	}
 

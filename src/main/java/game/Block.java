@@ -22,13 +22,13 @@ public class Block extends GameObject {
 	
 	@Override
 	public void render(GraphicsContext g) {
-		if (getId() == GameObjectType.BLOCK_BRICK_WALL)
+		if (getGameObjectType() == GameObjectType.BLOCK_BRICK_WALL)
 			g.drawImage(blocks[0], getX(), getY());
-		else if (getId() == GameObjectType.BLOCK_STEEL_WALL)
+		else if (getGameObjectType() == GameObjectType.BLOCK_STEEL_WALL)
 			g.drawImage(blocks[1], getX(), getY());
-		else if (getId() == GameObjectType.BLOCK_SEA_WALL)
+		else if (getGameObjectType() == GameObjectType.BLOCK_SEA_WALL)
 			g.drawImage(blocks[2], getX(), getY());
-		else if (getId() == GameObjectType.GOLDEN_CROWN)
+		else if (getGameObjectType() == GameObjectType.GOLDEN_CROWN)
 			g.drawImage(blocks[3], getX(), getY());
 	}
 	

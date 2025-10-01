@@ -81,7 +81,7 @@ public class Bullet extends GameObject {
             if (obj == this) continue;
 
             if (getBounds().intersects(obj.getBounds())) {
-                switch (obj.getId()) {
+                switch (obj.getGameObjectType()) {
                     case GameObjectType.BLOCK_BRICK_WALL -> {
                         gameContext.handler.removeObject(this);
                         gameContext.handler.removeObject(obj);

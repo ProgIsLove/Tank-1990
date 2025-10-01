@@ -6,17 +6,12 @@ import javafx.scene.input.KeyEvent;
 
 public class KeyInput {
 
-	private final HandlerImpl handlerImpl;
-	private final SpriteSheet sheet;
-	private final Hud hud;
+    private final GameContext gameContext;
     private final boolean[] keysDown = new boolean[4];
 	private boolean isShooting = false;
 
-	public KeyInput(HandlerImpl handlerImpl, SpriteSheet sheet, Hud hud) {
-
-		this.handlerImpl = handlerImpl;
-		this.sheet = sheet;
-		this.hud = hud;
+	public KeyInput(GameContext gameContext) {
+        this.gameContext = gameContext;
 
 		keysDown[0] = false;
 		keysDown[1] = false;
@@ -27,37 +22,33 @@ public class KeyInput {
 	public void keyPressed(KeyEvent e) {
 		KeyCode key = e.getCode();
 
-		for (int i = 0; i < handlerImpl.object.size(); i++) {
-			GameObject tempObject = handlerImpl.object.get(i);
-
-			if (tempObject.getId() == ID.PLAYER) {
+		for (GameObject player : gameContext.handler.getGameObjectsByType(GameObjectType.PLAYER)) {
 				if (key == KeyCode.W) {
-					tempObject.setSpeedY(-GameConstant.SPEED);
-					tempObject.setDirection(1);
+                    player.setSpeedY(-GameConstant.SPEED);
+                    player.setDirection(1);
 					keysDown[0] = true;
 				}
 				if (key == KeyCode.S) {
-					tempObject.setSpeedY(GameConstant.SPEED);
-					tempObject.setDirection(2);
+                    player.setSpeedY(GameConstant.SPEED);
+                    player.setDirection(2);
 					keysDown[1] = true;
 				}
 				if (key == KeyCode.A) {
-					tempObject.setSpeedX(-GameConstant.SPEED);
-					tempObject.setDirection(3);
+                    player.setSpeedX(-GameConstant.SPEED);
+                    player.setDirection(3);
 					keysDown[2] = true;
 				}
 				if (key == KeyCode.D) {
-					tempObject.setSpeedX(GameConstant.SPEED);
-					tempObject.setDirection(4);
+                    player.setSpeedX(GameConstant.SPEED);
+                    player.setDirection(4);
 					keysDown[3] = true;
 				}
 				if (key == KeyCode.SPACE && !isShooting) {
 					isShooting = true;
-					handlerImpl.addObject(new Bullet(tempObject.getX() + GameConstant.BULLET_SIZE / 2,
-							tempObject.getY() + GameConstant.BULLET_SIZE / 2, ID.BULLET, tempObject.getDirection(),
-                            handlerImpl, sheet, hud));
+					gameContext.handler.addObject(new Bullet(player.getX() + GameConstant.BULLET_SIZE / 2,
+                            player.getY() + GameConstant.BULLET_SIZE / 2, GameObjectType.BULLET, player.getDirection(), gameContext));
 				}
-			}
+
 			if (key == KeyCode.ESCAPE) System.exit(0);
 		}
 	}
@@ -65,28 +56,24 @@ public class KeyInput {
 	public void keyReleased(KeyEvent e) {
         KeyCode key = e.getCode();
 
-        for (int i = 0; i < handlerImpl.object.size(); i++) {
-			GameObject tempObject = handlerImpl.object.get(i);
-
-			if (tempObject.getId() == ID.PLAYER) {
+        for (GameObject player : gameContext.handler.getGameObjectsByType(GameObjectType.PLAYER)) {
 				if (key == KeyCode.W) {
 					keysDown[0] = false;
-					tempObject.setSpeedY(0);
+                    player.setSpeedY(0);
 				}
 				if (key == KeyCode.S) {
 					keysDown[1] = false;
-					tempObject.setSpeedY(0);
+                    player.setSpeedY(0);
 				}
 				if (key == KeyCode.A) {
 					keysDown[2] = false;
-					tempObject.setSpeedX(0);
+                    player.setSpeedX(0);
 				}
 				if (key == KeyCode.D) {
 					keysDown[3] = false;
-					tempObject.setSpeedX(0);
+                    player.setSpeedX(0);
 				}
 				if (key == KeyCode.SPACE) isShooting = false;
-			}
 		}
 	}
 }

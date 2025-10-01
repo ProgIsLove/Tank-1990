@@ -4,79 +4,86 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import static game.GameObjectType.*;
 
 public class Enemy extends GameObject {
 
     private final Spawner spawner;
-    private final Hud hud;
-    private final HandlerImpl handlerImpl;
-    private final SpriteSheet sheet;
     private final WritableImage[] enemyImages = new WritableImage[4];
 	private final Random rnd = new Random();
+    private final GameContext gameContext;
 
     private int timerShoot;
 
-	public Enemy(int x, int y, ID id, int direction, HandlerImpl handlerImpl,
-			SpriteSheet sheet, Spawner spawner, Hud hud) {
-		super(x, y, id, direction);
-		this.handlerImpl = handlerImpl;
-		this.sheet = sheet;
+	public Enemy(int x, int y, GameObjectType gameObjectType, int direction, Spawner spawner, GameContext gameContext) {
+		super(x, y, gameObjectType, direction);
 		this.spawner = spawner;
-		this.hud = hud;
+        this.gameContext = gameContext;
 
-		timerShoot = rnd.nextInt(GameConstant.TIMER_SHOOT);
+        timerShoot = rnd.nextInt(GameConstant.TIMER_SHOOT);
 
-		enemyImages[0] = sheet.grabImage(2, 4, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-		enemyImages[1] = sheet.grabImage(2, 5, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-		enemyImages[2] = sheet.grabImage(2, 6, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
-		enemyImages[3] = sheet.grabImage(3, 1, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		enemyImages[0] = gameContext.sheet.grabImage(2, 4, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		enemyImages[1] = gameContext.sheet.grabImage(2, 5, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		enemyImages[2] = gameContext.sheet.grabImage(2, 6, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+		enemyImages[3] = gameContext.sheet.grabImage(3, 1, GameConstant.TANK_SIZE, GameConstant.TANK_SIZE);
+
+
 	}
 	
 	@Override
 	public void tick() {
-		setSpeedX(GameConstant.SPEED);
-		setSpeedY(GameConstant.SPEED);
+        move();
+        shoot();
+        collision();
+	}
 
-		int tempY = getY();
-		int tempX = getX();
-
-		switch(getDirection()) {
-		case 1:{
-			tempY -= getSpeedY();
-			setY(tempY);
-			break;
-		}
-		case 2:{
-			tempY += getSpeedY();
-			setY(tempY);
-			break;
-		}
-		case 3:{
-			tempX -= getSpeedX();
-			setX(tempX);
-			break;
-		}
-		case 4:{
-			tempX += getSpeedX();
-			setX(tempX);
-			break;
-		}
-		default:
-			throw new IllegalArgumentException("Unexpected value: " + getDirection());
-		}
-		if (timerShoot <= 0) {
-			handlerImpl.addObject(new EnemyBullet(getX() + GameConstant.BULLET_SIZE / 2,
-					getY() + GameConstant.BULLET_SIZE / 2, ID.ENEMY_BULLET, getDirection(),
-                    handlerImpl, sheet, hud, spawner));
+    private void shoot() {
+        if (timerShoot <= 0) {
+            gameContext.handler.addObject(gameContext.factory.createGameObject(GameObjectType.ENEMY_BULLET, getX() + GameConstant.BULLET_SIZE / 2,
+                    getY() + GameConstant.BULLET_SIZE / 2, getDirection(), spawner));
 			timerShoot = rnd.nextInt(GameConstant.TIMER_SHOOT);
 		} else
 			timerShoot--;
-		
-		collision();
-	}
-	
-	@Override
+    }
+
+    private void move() {
+        setSpeedX(GameConstant.SPEED);
+        setSpeedY(GameConstant.SPEED);
+
+        int tempY = getY();
+        int tempX = getX();
+
+        switch(getDirection()) {
+        case 1:{
+            tempY -= getSpeedY();
+            setY(tempY);
+            break;
+        }
+        case 2:{
+            tempY += getSpeedY();
+            setY(tempY);
+            break;
+        }
+        case 3:{
+            tempX -= getSpeedX();
+            setX(tempX);
+            break;
+        }
+        case 4:{
+            tempX += getSpeedX();
+            setX(tempX);
+            break;
+        }
+        default:
+            throw new IllegalArgumentException("Unexpected value: " + getDirection());
+        }
+    }
+
+    @Override
 	public void render(GraphicsContext g) {
 		if (getDirection() == 1)
 			g.drawImage(enemyImages[0], getX(), getY());
@@ -94,50 +101,54 @@ public class Enemy extends GameObject {
 	}
 	
 	public void collision() {
-		for (int i = 0; i < handlerImpl.object.size(); i++) {
-			GameObject tempObject = handlerImpl.object.get(i);
+        List<GameObject> gameObjects = gameContext.handler.getGameObjectsByTypes(
+                BLOCK_SEA_WALL,
+                BLOCK_BRICK_WALL,
+                BLOCK_STEEL_WALL);
 
-			if (tempObject.getId() == ID.BLOCK_SEA_WALL || tempObject.getId() == ID.BLOCK_STEEL_WALL
-					|| tempObject.getId() == ID.BLOCK_BRICK_WALL) {
-				if (getBounds().intersects(tempObject.getBounds())) {
-					
-					int tempY = getY();
-					int tempX = getX();
-					int move;
+        for (GameObject obj : gameObjects) {
+            if (obj == this) continue;
 
-					if(getDirection() == 1) {
-						move = rnd.nextInt(4 + 1 - 1) + 1;
-						tempY += getSpeedY();
-						setY(tempY);
-						setDirection(move);
-						break;
-					}
-					
-					if(getDirection() == 2) {
-						move = rnd.nextInt(4 + 1 - 1) + 1;
-						tempY -= getSpeedY();
-						setY(tempY);
-						setDirection(move);
-						break;
-					}
-					
-					if(getDirection() == 3) {
-						move = rnd.nextInt(4 + 1 - 1) + 1;
-						tempX += getSpeedX();
-						setX(tempX);
-						setDirection(move);
-						break;
-					}
-					
-					if(getDirection() == 4) {
-						move = rnd.nextInt(4 + 1 - 1) + 1;
-						tempX -= getSpeedX();
-						setX(tempX);
-						setDirection(move);
-						break;
-					}
-				}
-			}
-		}
+            if (getBounds().intersects(obj.getBounds())) {
+                switch (obj.getId()) {
+                    case BLOCK_SEA_WALL, BLOCK_STEEL_WALL, BLOCK_BRICK_WALL -> {
+                        int tempY = getY();
+                        int tempX = getX();
+                        int move;
+
+                        if(getDirection() == 1) {
+                            move = rnd.nextInt(4 + 1 - 1) + 1;
+                            tempY += getSpeedY();
+                            setY(tempY);
+                            setDirection(move);
+                            break;
+                        }
+
+                        if(getDirection() == 2) {
+                            move = rnd.nextInt(4 + 1 - 1) + 1;
+                            tempY -= getSpeedY();
+                            setY(tempY);
+                            setDirection(move);
+                            break;
+                        }
+
+                        if(getDirection() == 3) {
+                            move = rnd.nextInt(4 + 1 - 1) + 1;
+                            tempX += getSpeedX();
+                            setX(tempX);
+                            setDirection(move);
+                            break;
+                        }
+
+                        if(getDirection() == 4) {
+                            move = rnd.nextInt(4 + 1 - 1) + 1;
+                            tempX -= getSpeedX();
+                            setX(tempX);
+                            setDirection(move);
+                        }
+                    }
+                }
+            }
+        }
 	}
 }

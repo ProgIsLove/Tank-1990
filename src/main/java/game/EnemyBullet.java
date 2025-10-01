@@ -4,60 +4,62 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 
+import java.util.List;
+
 public class EnemyBullet extends GameObject {
 
-	private final HandlerImpl handlerImpl;
-	private final Hud hud;
-	private final Spawner spawner;
+    private final Spawner spawner;
 	private final WritableImage bulletImage;
+    private final GameContext gameContext;
 
-	public EnemyBullet(int x, int y, ID id, int direction, HandlerImpl handlerImpl, SpriteSheet sheet,
-                       Hud hud, Spawner spawner) {
-		super(x, y, id, direction);
-		this.handlerImpl = handlerImpl;
-		this.hud = hud;
-		this.spawner = spawner;
+	public EnemyBullet(int x, int y, GameObjectType gameObjectType, int direction, Spawner spawner, GameContext gameContext) {
+		super(x, y, gameObjectType, direction);
+        this.spawner = spawner;
+        this.gameContext = gameContext;
 
-		bulletImage = sheet.grabImage(1, 5, GameConstant.BULLET_SIZE, GameConstant.BULLET_SIZE);
+		this.bulletImage = gameContext.sheet.grabImage(1, 5, GameConstant.BULLET_SIZE, GameConstant.BULLET_SIZE);
 	}
 	
 	@Override
 	public void tick() {
-		setSpeedY(GameConstant.BULLET_SPEED);
-		setSpeedX(GameConstant.BULLET_SPEED);
-		switch (getDirection()) {
-		case 1: {
-			int tempY = getY();
-			tempY -= getSpeedY();
-			setY(tempY);
-			break;
-		}
-		case 2: {
-			int tempY = getY();
-			tempY += getSpeedY();
-			setY(tempY);
-			break;
-		}
-		case 3: {
-			int tempX = getX();
-			tempX -= getSpeedX();
-			setX(tempX);
-			break;
-		}
-		case 4: {
-			int tempX = getX();
-			tempX += getSpeedX();
-			setX(tempX);
-			break;
-		}
-		default:
-			throw new IllegalArgumentException("Unexpected value: " + getDirection());
-		}
-
-		collision();
+        move();
+        collision();
 	}
-	
-	@Override
+
+    private void move() {
+        setSpeedY(GameConstant.BULLET_SPEED);
+        setSpeedX(GameConstant.BULLET_SPEED);
+        switch (getDirection()) {
+        case 1: {
+            int tempY = getY();
+            tempY -= getSpeedY();
+            setY(tempY);
+            break;
+        }
+        case 2: {
+            int tempY = getY();
+            tempY += getSpeedY();
+            setY(tempY);
+            break;
+        }
+        case 3: {
+            int tempX = getX();
+            tempX -= getSpeedX();
+            setX(tempX);
+            break;
+        }
+        case 4: {
+            int tempX = getX();
+            tempX += getSpeedX();
+            setX(tempX);
+            break;
+        }
+        default:
+            throw new IllegalArgumentException("Unexpected value: " + getDirection());
+        }
+    }
+
+    @Override
 	public void render(GraphicsContext g) {
 		g.drawImage(bulletImage, getX(), getY());
 	}
@@ -68,43 +70,42 @@ public class EnemyBullet extends GameObject {
 	}
 	
 	public void collision() {
-		for (int i = 0; i < handlerImpl.object.size(); i++) {
-			GameObject tempObject = handlerImpl.object.get(i);
-			int tempLive = hud.getLive();
-			int tempCrownLive = hud.getCrownLive();
+        List<GameObject> gameObjects = gameContext.handler.getGameObjectsByTypes(
+                GameObjectType.BULLET,
+                GameObjectType.PLAYER,
+                GameObjectType.GOLDEN_CROWN,
+                GameObjectType.BLOCK_BRICK_WALL,
+                GameObjectType.BLOCK_STEEL_WALL,
+                GameObjectType.BLOCK_SEA_WALL
+        );
 
-			if (tempObject.getId() == ID.BULLET || tempObject.getId() == ID.BLOCK_BRICK_WALL) {
-				if (getBounds().intersects(tempObject.getBounds())) {
-					handlerImpl.removeObject(this);
-					handlerImpl.removeObject(tempObject);
-				}
-			}
-			if (tempObject.getId() == ID.PLAYER) {
-				if (getBounds().intersects(tempObject.getBounds())) {
-					handlerImpl.removeObject(this);
-					handlerImpl.removeObject(tempObject);
-					tempLive -= 1;
-					hud.setLive(tempLive);
-					if(hud.getLive() != 0 || hud.getCrownLive() != 0) {
-						spawner.nextLive();
-					}
-				}
-			}
-			if (tempObject.getId() == ID.GOLDEN_CROWN) {
-				if (getBounds().intersects(tempObject.getBounds())) {
-					handlerImpl.removeObject(this);
-					handlerImpl.removeObject(tempObject);
-					tempCrownLive -= 1;
-					tempLive -= 1;
-					hud.setCrownLive(tempCrownLive);
-					hud.setLive(tempLive);
-				}
-			}
-			if (tempObject.getId() == ID.BLOCK_STEEL_WALL || tempObject.getId() == ID.BLOCK_SEA_WALL) {
-				if (getBounds().intersects(tempObject.getBounds())) {
-					handlerImpl.removeObject(this);
-				}
-			}
-		}
+        for (GameObject obj : gameObjects) {
+            if (obj == this) continue;
+
+            if (getBounds().intersects(obj.getBounds())) {
+                switch (obj.getId()) {
+                    case GameObjectType.BULLET, GameObjectType.BLOCK_BRICK_WALL -> {
+                        gameContext.handler.removeObject(this);
+                        gameContext.handler.removeObject(obj);
+                    }
+                    case GameObjectType.PLAYER -> {
+                        gameContext.handler.removeObject(this);
+                        gameContext.handler.removeObject(obj);
+                        int tempLive = gameContext.hud.getLive() - 1;
+                        gameContext.hud.setLive(tempLive);
+                        if (gameContext.hud.getLive() != 0 || gameContext.hud.getCrownLive() != 0) {
+                            spawner.nextLive();
+                        }
+                    }
+                    case GameObjectType.GOLDEN_CROWN -> {
+                        gameContext.handler.removeObject(this);
+                        gameContext.handler.removeObject(obj);
+                        gameContext.hud.setCrownLive(gameContext.hud.getCrownLive() - 1);
+                        gameContext.hud.setLive(gameContext.hud.getLive() - 1);
+                    }
+                    case GameObjectType.BLOCK_STEEL_WALL, GameObjectType.BLOCK_SEA_WALL -> gameContext.handler.removeObject(this);
+                }
+            }
+        }
 	}
 }

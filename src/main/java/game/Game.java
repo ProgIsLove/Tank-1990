@@ -9,29 +9,27 @@ import javafx.stage.Stage;
 
 public class Game extends Canvas implements Renderable, Tickable {
 
-	private final HandlerImpl handlerImpl;
-	private final Map map;
+    private final Map map;
 	private final Spawner spawner;
-	private final BufferedImageLoader loader;
-	private final SpriteSheet sheet;
-	private final Level level;
+    private final Level level;
 	private final Hud hud;
     private final KeyInput keyInput;
+    private final GameContext gameContext;
     private AnimationTimer gameLoop;
 
 	public Game() {
         super(GameConstant.WIDTH, GameConstant.HEIGHT);
 
-		loader = new BufferedImageLoader();
-
-        sheet = new SpriteSheet(loader.loadImage("/img/SpriteSheetPic.png"));
+        SpriteSheet sheet = new SpriteSheet();
 		level = new Level();
-		handlerImpl = new HandlerImpl();
+        HandlerImpl handlerImpl = new HandlerImpl();
 		hud = new Hud();
-		spawner = new Spawner(handlerImpl, sheet, hud);
-		map = new Map(handlerImpl, spawner, sheet, level);
 
-        keyInput = new KeyInput(handlerImpl, sheet, hud);
+        gameContext = new GameContext(handlerImpl, sheet, hud);
+        spawner = new Spawner(gameContext);
+		map = new Map(level, gameContext, spawner);
+
+        keyInput = new KeyInput(gameContext);
 
         setupGameLoop();
 	}
@@ -62,10 +60,10 @@ public class Game extends Canvas implements Renderable, Tickable {
 
     @Override
     public void tick() {
-        handlerImpl.tick();
+        gameContext.handler.tick();
         map.tick();
         if (hud.getLive() <= 0 || hud.getCrownLive() <= 0) {
-            handlerImpl.object.clear();
+            gameContext.handler.clear();
             this.stopGameLoop();
             Platform.runLater(() -> {
                 Stage stage = (Stage) this.getScene().getWindow();
@@ -83,7 +81,7 @@ public class Game extends Canvas implements Renderable, Tickable {
         gc.fillRect(0, 0, GameConstant.WIDTH, GameConstant.HEIGHT);
 
         // let other components render
-        handlerImpl.render(gc);
+        gameContext.handler.render(gc);
         hud.render(gc);
     }
 }

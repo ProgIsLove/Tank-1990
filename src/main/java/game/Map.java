@@ -4,21 +4,19 @@ import java.util.Random;
 
 public class Map implements Tickable {
 
-    private final HandlerImpl handlerImpl;
-    private final SpriteSheet sheet;
-    private final Spawner spawner;
     private final Level level;
     private final Random rnd = new Random();
+    private final GameContext gameContext;
+    private final Spawner spawner;
 
     private boolean isDraw = false;
 
     private int[][] gameField;
 
-    public Map(HandlerImpl handlerImpl, Spawner spawner, SpriteSheet sheet, Level level) {
-        this.handlerImpl = handlerImpl;
-        this.spawner = spawner;
-        this.sheet = sheet;
+    public Map(Level level, GameContext gameContext, Spawner spawner) {
         this.level = level;
+        this.gameContext = gameContext;
+        this.spawner = spawner;
     }
 
     @Override
@@ -40,12 +38,17 @@ public class Map implements Tickable {
                 int x = col * GameConstant.BLOCK_SIZE;
                 int y = row * GameConstant.BLOCK_SIZE;
 
-                switch (blockValue) {
-                    case 1 -> handlerImpl.addObject(new Block(x, y, ID.BLOCK_BRICK_WALL, sheet));
-                    case 2 -> handlerImpl.addObject(new Block(x, y, ID.BLOCK_STEEL_WALL, sheet));
-                    case 3 -> handlerImpl.addObject(new Block(x, y, ID.GOLDEN_CROWN, sheet));
-                    case 4 -> handlerImpl.addObject(new Player(x, y, ID.PLAYER, 1, handlerImpl, sheet));
-                    case 5 -> handlerImpl.addObject(new Block(x, y, ID.BLOCK_SEA_WALL, sheet));
+                GameObject obj = switch (blockValue) {
+                    case 1 -> gameContext.factory.createGameObject(GameObjectType.BLOCK_BRICK_WALL, x, y);
+                    case 2 -> gameContext.factory.createGameObject(GameObjectType.BLOCK_STEEL_WALL, x, y);
+                    case 3 -> gameContext.factory.createGameObject(GameObjectType.GOLDEN_CROWN, x, y);
+                    case 4 -> gameContext.factory.createGameObject(GameObjectType.PLAYER, x, y, 1);
+                    case 5 -> gameContext.factory.createGameObject(GameObjectType.BLOCK_SEA_WALL, x, y);
+                    default -> null;
+                };
+
+                if (obj != null) {
+                    gameContext.handler.addObject(obj);
                 }
             }
         }

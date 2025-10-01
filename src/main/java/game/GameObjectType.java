@@ -1,6 +1,6 @@
 package game;
 
-public enum ID {
+public enum GameObjectType {
 
     PLAYER,
     BULLET,

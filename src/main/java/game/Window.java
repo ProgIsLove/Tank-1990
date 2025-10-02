@@ -4,62 +4,37 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class Window extends Application {
 
 	private final Game game;
+    private final UIFactory factory;
 
     public Window() {
         this.game = new Game();
+        this.factory = new DefaultUIFactory();
     }
 
     @Override
     public void start(Stage stage) {
-        Label titleBuilder = new LabelBuilder()
-                .text("Tank 1990")
-                .fontSize(48)
-                .fontFamily("Arial")
-                .bold()
-                .color(Color.DARKCYAN).build();
+        Label titleLabel = factory.createTitleLabel("Tank 1990");
+        Label instructions = factory.createInstructionsLabel("""
+                Move:
+                 W - up, S - down, A - left, D - right
+                Shoot:
+                 Spacebar
+                """);
 
-        Label instructions = new LabelBuilder()
-                .text("""
-            Move:
-              W - up, S - down, A - left, D - right
-            Shoot:
-              Spacebar
-            """)
-                .fontSize(20)
-                .bold()
-                .fontFamily("Arial")
-                .color(Color.WHITE)
-                .align(Pos.CENTER)
-                .setTextAlignment(TextAlignment.CENTER)
-                .setStyle("-fx-background-color: rgb(12,105,128); " +
-                        "-fx-background-radius: 12; " +
-                        "-fx-border-radius: 12;")
-                .setMinHeight(120)
-                .setPadding(new Insets(7))
-                .build();
+        Button playButton = factory.createButton("Play");
+        Button quitButton = factory.createButton("Quit");
 
-        VBox menuLayout = getVBox(stage, titleBuilder, instructions);
-
-        Scene scene = new Scene(menuLayout, GameConstant.WIDTH, GameConstant.HEIGHT);
-
-        stage.setTitle("Tank 1990");
-        stage.setResizable(false);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private VBox getVBox(Stage stage, Label titleLabel, Label instructions) {
-        UIComponent hbox = new Box((play -> play.setOnAction(e -> {
+        playButton.setOnAction(e -> {
             BorderPane gameRoot = new BorderPane();
             gameRoot.setCenter(game);
             Scene gameScene = new Scene(gameRoot, GameConstant.WIDTH, GameConstant.HEIGHT);
@@ -69,12 +44,23 @@ public class Window extends Application {
 
             stage.setScene(gameScene);
             game.start();
-        })), quit -> quit.setOnAction(e -> stage.close()));
+        });
 
-        VBox menuLayout = new VBox(30, titleLabel, instructions, hbox.getNode());
+        quitButton.setOnAction(e -> stage.close());
+
+        HBox buttons = new HBox(20, playButton, quitButton);
+        buttons.setAlignment(Pos.CENTER);
+
+        VBox menuLayout = new VBox(30, titleLabel, instructions, buttons);
         menuLayout.setAlignment(Pos.CENTER);
         menuLayout.setPadding(new Insets(40));
-        return menuLayout;
+
+        Scene scene = new Scene(menuLayout, GameConstant.WIDTH, GameConstant.HEIGHT);
+
+        stage.setTitle("Tank 1990");
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {

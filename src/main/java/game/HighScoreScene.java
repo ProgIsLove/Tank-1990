@@ -21,44 +21,25 @@ public class HighScoreScene {
 
     private final Stage stage;
     private final int score;
-    private final HighScoreDAO dao = new HighScoreDAOImpl();
+    private final HighScoreDAO dao;
+    private final UIFactory factory;
 
     public HighScoreScene(Stage stage, int score) {
         this.stage = stage;
         this.score = score;
+        this.dao = new HighScoreDAOImpl();
+        this.factory = new DefaultUIFactory();
         showScene();
     }
 
     private void showScene() {
-        Label titleLabel = new LabelBuilder()
-                .text("High Score")
-                .bold()
-                .fontSize(48)
-                .fontFamily("Arial")
-                .color(Color.DARKCYAN)
-                .build();
+        Label titleLabel = factory.createTitleLabel("High Score");
+        Label scoreLabel = factory.createBoldLabel("Your Score: " + this.score);
+        TextField nameInput = factory.createNameInput();
 
-        Label scoreLabel = new LabelBuilder()
-                .text("Your Score: " + this.score)
-                .bold()
-                .fontSize(20)
-                .fontFamily("Arial")
-                .build();
-
-        TextField nameInput = new TextField();
-        nameInput.setPromptText("ABC");
-        nameInput.setMaxWidth(80);
-        nameInput.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        nameInput.setTextFormatter(new TextFormatter<String>(change ->
-                change.getControlNewText().length() <= 3 ? change : null
-        ));
-
-        Button submitButton = new ButtonBuilder()
-                .text("Submit Score")
-                .fontFamily("Arial")
-                .bold()
-                .fontSize(16)
-                .build();
+        Button submitScoreButton = factory.createButton("Submit Score");
+        Button playAgainButton = factory.createButton("Play Again");
+        Button quitButton = factory.createButton("Quit");
 
         VBox scoreListBox = new VBox(5);
         scoreListBox.setAlignment(Pos.CENTER);
@@ -67,36 +48,24 @@ public class HighScoreScene {
         HBox buttons = new HBox(20);
         buttons.setAlignment(Pos.CENTER);
 
-        Button playAgainButton = new ButtonBuilder()
-                .text("▶ Play Again")
-                .fontFamily("Arial")
-                .bold()
-                .fontSize(16).build();
-
-        Button quitButton = new ButtonBuilder()
-                .text("✖ Quit")
-                .fontFamily("Arial")
-                .bold()
-                .fontSize(16).build();
-
         buttons.getChildren().addAll(playAgainButton, quitButton);
 
         VBox topSection = new VBox(0, titleLabel, scoreLabel);
         topSection.setAlignment(Pos.CENTER);
 
-        VBox layout = new VBox(8, topSection, nameInput, submitButton, scoreListBox, buttons);
+        VBox layout = new VBox(8, topSection, nameInput, submitScoreButton, scoreListBox, buttons);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(5));
 
         Scene scene = new Scene(layout, GameConstant.WIDTH, GameConstant.HEIGHT);
 
         // Button actions
-        submitButton.setOnAction(e -> {
+        submitScoreButton.setOnAction(e -> {
             String name = nameInput.getText().trim();
             if (!name.isEmpty()) {
                 dao.saveScore(new HighScore(name, this.score));
                 updateScoreList(scoreListBox);
-                submitButton.setDisable(true);
+                submitScoreButton.setDisable(true);
                 nameInput.setDisable(true);
             }
         });
@@ -121,8 +90,7 @@ public class HighScoreScene {
         scoreListBox.getChildren().clear();
         List<HighScore> topScores = dao.getTopScores(3);
         for (HighScore hs : topScores) {
-            Label label = new Label(hs.name() + " - " + hs.score());
-            label.setFont(Font.font("Arial", 18));
+            Label label = factory.createNormalLabel(hs.name() + " - " + hs.score());
             scoreListBox.getChildren().add(label);
         }
     }

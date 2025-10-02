@@ -100,6 +100,4 @@ public class LabelBuilder implements UIComponent {
         return build();
     }
 
-
-
 }

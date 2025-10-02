@@ -1,21 +1,22 @@
 package game;
 
-import javafx.scene.Node;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
-public class TextFieldBuilder implements UIComponent {
+public class TextFieldBuilder {
 
     private String promptText = "";
     private String fontFamily = "Arial";
     private int fontSize = 16;
     private FontWeight fontWeight = FontWeight.NORMAL;
     private FontPosture fontPosture = FontPosture.REGULAR;
-    private Color textColor = Color.BLACK;
+    private Color textColor = Color.BLUE;
     private double maxWidth = -1;
+    private int maxLength = -1;
 
     private TextField builtTextField;
 
@@ -54,29 +55,25 @@ public class TextFieldBuilder implements UIComponent {
         return this;
     }
 
+    public TextFieldBuilder maxLength(int maxLength) {
+        this.maxLength = maxLength;
+        return this;
+    }
+
     public TextField build() {
         if (builtTextField == null) {
             builtTextField = new TextField();
             builtTextField.setPromptText(promptText);
             builtTextField.setFont(Font.font(fontFamily, fontWeight, fontPosture, fontSize));
-            builtTextField.setStyle("-fx-text-fill: " + toRgbString(textColor) + ";");
             if (maxWidth > 0) {
                 builtTextField.setMaxWidth(maxWidth);
             }
+            if (maxLength > 0) {
+                builtTextField.setTextFormatter(new TextFormatter<String>(change ->
+                        change.getControlNewText().length() <= maxLength ? change : null
+                ));
+            }
         }
         return builtTextField;
-    }
-
-    @Override
-    public Node getNode() {
-        return build();
-    }
-
-    // helper: convert Color -> CSS rgb string
-    private String toRgbString(Color c) {
-        return String.format("rgb(%d,%d,%d)",
-                (int) (c.getRed() * 255),
-                (int) (c.getGreen() * 255),
-                (int) (c.getBlue() * 255));
     }
 }

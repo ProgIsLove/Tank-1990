@@ -69,7 +69,7 @@ public class TextFieldBuilder {
                 builtTextField.setMaxWidth(maxWidth);
             }
             if (maxLength > 0) {
-                builtTextField.setTextFormatter(new TextFormatter<String>(change ->
+                builtTextField.setTextFormatter(new TextFormatter<>(change ->
                         change.getControlNewText().length() <= maxLength ? change : null
                 ));
             }

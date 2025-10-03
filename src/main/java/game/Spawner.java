@@ -5,8 +5,8 @@ public class Spawner {
 
     private final GameContext gameContext;
 
-	private int counter = 0;
-	private int respawnTime;
+
+    private int respawnTime;
 
 	public Spawner(GameContext gameContext) {
         this.gameContext = gameContext;
@@ -15,6 +15,7 @@ public class Spawner {
 	}
 	
 	public void nextEnemy(int blockSpaceX, int blockSpaceY) {
+        int counter;
         Hud hud = gameContext.hud;
         if(hud.getEnemyCount() <= GameConstant.MAX_ENEMIES) {
             if (respawnTime <= 0) {

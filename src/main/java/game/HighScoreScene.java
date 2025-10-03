@@ -38,8 +38,8 @@ public class HighScoreScene {
         TextField nameInput = factory.createNameInput();
 
         Button submitScoreButton = factory.createButton("Submit Score");
-        Button playAgainButton = factory.createButton("Play Again");
-        Button quitButton = factory.createButton("Quit");
+        Button playAgainButton = factory.createPlayButton("Play Again", stage, new Game());
+        Button quitButton = factory.createQuitButton(stage);
 
         VBox scoreListBox = new VBox(5);
         scoreListBox.setAlignment(Pos.CENTER);
@@ -69,19 +69,6 @@ public class HighScoreScene {
                 nameInput.setDisable(true);
             }
         });
-
-        playAgainButton.setOnAction(e -> {
-            Game game = new Game();
-            BorderPane gameRoot = new BorderPane();
-            gameRoot.setCenter(game);
-            Scene gameScene = new Scene(gameRoot, GameConstant.WIDTH, GameConstant.HEIGHT);
-            gameScene.setOnKeyPressed(ev -> game.getKeyInput().keyPressed(ev));
-            gameScene.setOnKeyReleased(ev -> game.getKeyInput().keyReleased(ev));
-            stage.setScene(gameScene);
-            game.start();
-        });
-
-        quitButton.setOnAction(e -> stage.close());
 
         stage.setScene(scene);
     }

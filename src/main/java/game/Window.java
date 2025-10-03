@@ -6,7 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -31,22 +30,8 @@ public class Window extends Application {
                  Spacebar
                 """);
 
-        Button playButton = factory.createButton("Play");
-        Button quitButton = factory.createButton("Quit");
-
-        playButton.setOnAction(e -> {
-            BorderPane gameRoot = new BorderPane();
-            gameRoot.setCenter(game);
-            Scene gameScene = new Scene(gameRoot, GameConstant.WIDTH, GameConstant.HEIGHT);
-
-            gameScene.setOnKeyPressed(ev -> game.getKeyInput().keyPressed(ev));
-            gameScene.setOnKeyReleased(ev -> game.getKeyInput().keyReleased(ev));
-
-            stage.setScene(gameScene);
-            game.start();
-        });
-
-        quitButton.setOnAction(e -> stage.close());
+        Button playButton = factory.createPlayButton("Play", stage, game);
+        Button quitButton = factory.createQuitButton(stage);
 
         HBox buttons = new HBox(20, playButton, quitButton);
         buttons.setAlignment(Pos.CENTER);

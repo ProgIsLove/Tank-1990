@@ -2,11 +2,14 @@ package game;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 public class DefaultUIFactory implements UIFactory {
 
@@ -18,6 +21,28 @@ public class DefaultUIFactory implements UIFactory {
                 .fontSize(16)
                 .fontFamily("Arial")
                 .build();
+    }
+
+    @Override
+    public Button createPlayButton(String text, Stage stage, Game game) {
+        Button btn = createButton(text);
+        btn.setOnAction(e -> {
+            BorderPane gameRoot = new BorderPane();
+            gameRoot.setCenter(game);
+            Scene gameScene = new Scene(gameRoot, GameConstant.WIDTH, GameConstant.HEIGHT);
+            gameScene.setOnKeyPressed(ev -> game.getKeyInput().keyPressed(ev));
+            gameScene.setOnKeyReleased(ev -> game.getKeyInput().keyReleased(ev));
+            stage.setScene(gameScene);
+            game.start();
+        });
+        return btn;
+    }
+
+    @Override
+    public Button createQuitButton(Stage stage) {
+        Button btn = createButton("Quit");
+        btn.setOnAction(e -> stage.close());
+        return btn;
     }
 
     @Override

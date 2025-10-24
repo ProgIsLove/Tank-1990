@@ -22,7 +22,7 @@ The following items should be installed in your system:
  
  3) Play & Enjoy!
  
-# <img alt="menu" src="https://imgur.com/2KZyPyE.png">
+# <img alt="menu" src="[https://imgur.com/2KZyPyE.png](https://imgur.com/a/94S8Elv)">
  
 # <img alt="menu difficulty" src="https://imgur.com/VLz9XNm.png">
 
